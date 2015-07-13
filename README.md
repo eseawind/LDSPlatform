@@ -1,2 +1,4 @@
 # LDSPlatform
-立达信质检客户端
+
+
+![image](https://github.com/PhoneChan/LDSPlatform/blob/master/screenshots/login.png)
