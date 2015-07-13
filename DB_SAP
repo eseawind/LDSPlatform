@@ -1,0 +1,251 @@
+CREATE TABLE ADM_MES.DROID_OQC_RESOURCE( 
+	RESOURCE_ID VARCHAR2(1000) NOT NULL, 
+	DOCUMENT_HEADER_ID NUMBER NOT NULL,--头表ID
+	FILE_NAME VARCHAR2(1000),
+	CONTENT_TYPE VARCHAR2(1000),
+	FILE_PATH VARCHAR2(1000),
+	ATTR1 VARCHAR2(1000),--ATTR1
+	ATTR2 VARCHAR2(1000),--ATTR2
+	ATTR3 VARCHAR2(1000),--ATTR3
+	ATTR4 VARCHAR2(1000),--ATTR4
+	ATTR5 VARCHAR2(1000),--ATTR5
+	CREATED_BY VARCHAR2(1000) NOT NULL, 
+	CREATION_DATE VARCHAR2(1000) NOT NULL, 
+	LAST_UPDATED_BY VARCHAR2(1000),
+	LAST_UPDATED_DATE VARCHAR2(1000)
+	--PRIMARY KEY (RESOURCE_ID) 
+);
+
+CREATE TABLE ADM_MES.DROID_OQC_DOCUMENT_HEADER (
+	DOCUMENT_HEADER_ID NUMBER NOT NULL,--主键ID
+	DOCUMENT_NUMBER VARCHAR2(30) NOT NULL,--检验批号
+	DOCUMENT_TYPE VARCHAR2(30) NOT NULL,--表单类型
+	DOCUMENT_STATUS VARCHAR2(30) NOT NULL,--待检/归档
+	--WORK_ORDER_ID NUMBER NOT NULL,--生产订单号
+	INSPECTION_DATE DATE NOT NULL,--监装日期
+	OUTBOUND_DELIVERY_NUMBER VARCHAR2(1000),--外向交货单号ID
+	CUSTOMER VARCHAR2(1000),--客户简称
+	--SALES_ORDER_NUMBER VARCHAR2(1000),--销售订单号
+	CABINET_NUMBER VARCHAR2(250),--柜号
+	LOCK_NUMBER VARCHAR2(250),--锁号
+	ACTUAL_SHIPMENT NUMBER,--实际出货数量
+	RESULT_CODE VARCHAR2(30) NOT NULL,--判定结果(合格/不合格)
+	INSPECTION_EXCEPTION VARCHAR2(3000),--异常现象
+	INSPECTOR VARCHAR2(1000),--监装人员
+	ATTR1 VARCHAR2(1000),--ATTR1
+	ATTR2 VARCHAR2(1000),--ATTR2
+	ATTR3 VARCHAR2(1000),--ATTR3
+	ATTR4 VARCHAR2(1000),--ATTR4
+	ATTR5 VARCHAR2(1000),--ATTR5
+	CREATED_BY NUMBER NOT NULL,
+	CREATION_DATE DATE NOT NULL,
+	LAST_UPDATED_BY NUMBER NOT NULL,
+	LAST_UPDATE_DATE DATE NOT NULL,
+	LAST_UPDATE_LOGIN NUMBER,
+	PRIMARY KEY (DOCUMENT_HEADER_ID)
+);
+
+CREATE TABLE ADM_MES.DROID_OQC_SALE_ORDERS (
+	SALE_ORDER_ID NUMBER NOT NULL,--销售订单ID
+	DOCUMENT_HEADER_ID NUMBER NOT NULL,--头表ID
+	SALES_ORDER_NUMBER VARCHAR2(1000),--销售订单号
+	ATTR1 VARCHAR2(1000),--ATTR1
+	ATTR2 VARCHAR2(1000),--ATTR2
+	ATTR3 VARCHAR2(1000),--ATTR3
+	ATTR4 VARCHAR2(1000),--ATTR4
+	ATTR5 VARCHAR2(1000),--ATTR5
+	CREATED_BY NUMBER NOT NULL,
+	CREATION_DATE DATE NOT NULL,
+	LAST_UPDATED_BY NUMBER NOT NULL,
+	LAST_UPDATE_DATE DATE NOT NULL,
+	LAST_UPDATE_LOGIN NUMBER,
+	PRIMARY KEY (SALE_ORDER_ID)
+);
+
+--监装OQC行表/DROID_OQC_DOCUMENT_LINE/
+CREATE TABLE ADM_MES.DROID_OQC_DOCUMENT_LINE (
+	DOCUMENT_HEADER_ID NUMBER NOT NULL,
+	DOCUMENT_LINE_ID NUMBER NOT NULL,
+	LEVEL_1 NUMBER NOT NULL,
+	LEVEL_2 NUMBER,
+	LEVEL_3 NUMBER,
+	--OPTION_ID NUMBER NOT NULL,
+	RESULT_CODE VARCHAR2(30) NOT NULL,
+	RESULT_TEXT VARCHAR2(3000),
+	ATTR1 VARCHAR2(1000),--ATTR1
+	ATTR2 VARCHAR2(1000),--ATTR2
+	ATTR3 VARCHAR2(1000),--ATTR3
+	ATTR4 VARCHAR2(1000),--ATTR4
+	ATTR5 VARCHAR2(1000),--ATTR5
+	CREATED_BY NUMBER NOT NULL,
+	CREATION_DATE DATE NOT NULL,
+	LAST_UPDATED_BY NUMBER NOT NULL,
+	LAST_UPDATE_DATE DATE NOT NULL,
+	LAST_UPDATE_LOGIN NUMBER,
+	PRIMARY KEY (DOCUMENT_LINE_ID)
+);
+
+alter table DROID_FND_RESOURCE
+ADD DOCUMENT_HEADER_ID NUMBER NOT NULL;
+
+
+select * from DROID_OQC_RESOURCE;
+
+UPDATE OR INSERT INTO ADM_MES.DROID_OQC_RESOURCE 
+(RESOURCE_ID,DOCUMENT_HEADER_ID,FILE_NAME,CONTENT_TYPE,FILE_PATH,CREATED_BY,CREATION_DATE,LAST_UPDATED_BY,LAST_UPDATED_DATE)
+   VALUES 
+('c85f612c-23a2-4ec1-a92e-4fa0db5556df',11111,'c85f612c-23a2-4ec1-a92e-4fa0db5556df','image/jpeg','/home/chenfeng/Desktop/LEEDARSON/picupload/','-1','2014-12-12 15:58:16','-1','2014-12-12 15:58:16');
+
+select dodh.DOCUMENT_NUMBER from DROID_OQC_DOCUMENT_HEADER dodh where dodh.DOCUMENT_HEADER_ID = (select max(t.DOCUMENT_HEADER_ID) from DROID_OQC_DOCUMENT_HEADER t);
+
+
+
+
+select lmo.make_order_num, --生产订单 
+       lmo.po_number, --销售订单 
+       lmo.so_number, --销售订单项目号 
+       lmo.po_qty, --销售数量 
+       lmo.customer,--客户简称 
+       hi.item_code, --ID, 
+       hi.descriptions, --短描述 
+       hi.long_descriptions, --长描述 
+       hic.one_item_group, --一阶物料组 
+       hplg.DESCRIPTIONS, --生产课别 
+       hpl.DESCRIPTIONS, --生产线别 
+       hp.DESCRIPTIONS --生产工厂 
+  from ldx_make_order            lmo, 
+       ldx_mo_wo_ref             lmwr, 
+       hcm_item                  hi, 
+       hcm_item_control          hic, 
+       hcm_production_line       hpl, 
+       hcm_production_line_group hplg, 
+       hme_work_order            hwo, 
+       hcm_plant                 hp 
+ where 1 = 1 
+   and lmo.plant_id = hi.plant_id 
+   and hi.item_id = lmo.item_id 
+   and hi.plant_id = hic.plant_id() 
+   and hi.item_id = hic.item_id() 
+   and hwo.plant_id = hpl.plant_id 
+   and hwo.prod_line_id = hpl.prod_line_id 
+   and lmwr.make_order_id = lmo.make_order_id 
+   and lmwr.work_order_id = hwo.work_order_id 
+   and hpl.prod_line_group_id = hplg.prod_line_group_id 
+   and lmo.plant_id=hp.plant_id 
+   and hwo.WORK_ORDER_NUM = '100014913401'
+   
+   
+   
+   
+SELECT lmo.make_order_num, --生产订单
+       lmo.po_number, --销售订单
+       lmo.so_number, --销售订单项目号
+       lsl.so_line_qty, --销售数量
+       lmo.customer, --客户简称
+       hiv.item_code, --ID,
+       hiv.descriptions, --短描述
+       hiv.long_descriptions, --长描述
+       hiv.one_item_group, --一阶物料组
+       hplg.descriptions, --生产课别
+       hpl.descriptions, --生产线别
+       hp.descriptions --生产工厂
+  FROM ldx_make_order            lmo,
+       ldx_mo_wo_ref             lmwr,
+       hcm_item_v                hiv,
+       hcm_production_line       hpl,
+       hcm_production_line_group hplg,
+       hme_work_order            hwo,
+       hcm_plant                 hp,
+       ldx_so_line_mv 			lsl
+WHERE 1 = 1
+   AND lmo.plant_id = hiv.plant_id
+   AND hiv.item_id = lmo.item_id
+   AND hwo.plant_id = hpl.plant_id
+   AND hwo.prod_line_id = hpl.prod_line_id
+   AND lmwr.make_order_id = lmo.make_order_id
+   AND lmwr.work_order_id = hwo.work_order_id
+   AND hpl.prod_line_group_id = hplg.prod_line_group_id
+   AND lmo.plant_id = hp.plant_id
+   AND lmo.po_number = lsl.so_number(+)
+   AND hwo.work_order_num = 100019076301;
+   
+   
+select * from hme_work_order hwo where hwo.WORK_ORDER_NUM = 100019076301;
+
+
+SELECT lmo.make_order_num, --生产订单
+       lmo.po_number, --销售订单
+       lmo.so_number, --销售订单项目号
+       lsl.so_line_qty, --销售数量
+       lmo.customer, --客户简称
+       hiv.item_code, --ID,
+       hiv.descriptions, --短描述
+       hiv.long_descriptions, --长描述
+       hiv.one_item_group, --一阶物料组
+       hplg.descriptions, --生产课别
+       hpl.descriptions, --生产线别
+       hp.descriptions --生产工厂
+  FROM ldx_make_order            lmo,
+       ldx_mo_wo_ref             lmwr,
+       hcm_item_v                  hiv,
+       hcm_production_line       hpl,
+       hcm_production_line_group hplg,
+       hme_work_order            hwo,
+       hcm_plant                 hp,
+       ldx_so_line_mv lsl
+WHERE 1 = 1
+   AND lmo.plant_id = hiv.plant_id
+   AND hiv.item_id = lmo.item_id
+   AND hwo.prod_line_id = hpl.prod_line_id
+   AND lmwr.make_order_id = lmo.make_order_id
+   AND lmwr.work_order_id = hwo.work_order_id
+   AND hpl.prod_line_group_id = hplg.prod_line_group_id
+   AND lmo.plant_id = hp.plant_id
+   AND lmo.po_number = lsl.so_number(+)
+   and lmo.so_number = lsl.LINE_NUM(+)
+   AND hwo.work_order_num = '100019076301'
+
+select * from DROID_QUESTION_OPTIONS;
+
+
+select * from DROID_DOCUMENT_HEADER ddh
+where ddh.WORK_ORDER_ID = '100020495907'
+  order by ddh.DOCUMENT_HEADER_ID desc;
+  
+
+
+
+SELECT DISTINCT ddh.document_header_id, 
+       ddh.document_number, 
+       v.lookup_code type_code, 
+       v.meaning doc_type, 
+       hwo.work_order_num, 
+       lmo.po_number, 
+       lmo.so_number, 
+       lmo.customer, 
+       hpl.production_line_alt, 
+       '' iqc, 
+       ddh.creation_date, 
+       hiv.LONG_DESCRIPTIONS, 
+       nvl(ddh.prod_line_id, hwo.prod_line_id) prod_line_id, 
+       nvl(ddh.PROD_LINE_GROUP_ID, hpl.PROD_LINE_GROUP_ID) PROD_LINE_GROUP_ID,
+       ddh.SHIFT_CODE
+  FROM droid_document_header ddh, 
+       hfwk_lookup_types_v   v, 
+       hme_work_order_b      hwo, 
+       ldx_mo_wo_ref         lmr, 
+       ldx_make_order        lmo, 
+       hcm_production_line   hpl, 
+       hcm_item_v              hiv
+WHERE 1 = 1 
+   AND v.lookup_type_code = 'DROID_DOCUMENT_TYPE' 
+   AND v.lookup_code = ddh.document_type 
+   AND ddh.work_order_id = hwo.work_order_num 
+   AND hwo.work_order_id = lmr.work_order_id 
+   AND lmr.make_order_id = lmo.make_order_id 
+   AND nvl(ddh.prod_line_id, hwo.prod_line_id) = hpl.prod_line_id 
+   AND hiv.item_id = lmo.item_id
+   AND ddh.document_status = ?  
+   AND ddh.creation_date BETWEEN to_date('fromDate', 'yyyy-mm-dd hh24:mi:ss') AND 
+       to_date('toDate', 'yyyy-mm-dd hh24:mi:ss')
+   AND hwo.WORK_ORDER_NUM in (select hwo.WORK_ORDER_NUM from hme_work_order_b hwo where hwo.PLANT_ID = ?);

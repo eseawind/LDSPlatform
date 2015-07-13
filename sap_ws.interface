@@ -1,0 +1,82 @@
+ 1、获取检验批明细接口。
+    URL：http://192.168.0.103:8000/sap/bc/srt/wsdl/srvc_005056973A401EE4B38FF503CAA95F00/wsdl11/allinone/ws_policy/document?sap-client=600
+    函数名称：ZWS_INSPLOT_GETDETAIL
+    传入参数：检验批编号PRUEFLOS
+    返回信息：状态标识G_FLAG（S：成功，E：失败）
+                     信息G_MESSAGE
+    抬头信息：GT_HEADER（是一个结构，里面有一行数据）
+                      工厂  WERK
+                      物料号  MATNR
+                      物料描述  KTEXTMAT
+                      销售订单  KDAUF
+                      生产订单  Z_AUFNR
+                      生产线别  ZZSCXB
+                      生产课别  ZZSCKB
+                      生产部门  ZZSCBM
+    列表信息：GT_ITEM（是一个内表，里面有多行数据）
+                      特性  MERKNR
+                      状态  SATZSTATUS
+                      检验特性短文本  KURZTEXT
+                      需检验数  PRUEFUMF
+                      说明  KTX01
+                      已检验数  ANZWERTG
+                      结果  ZRESULT
+                      定性标识   KATAB1
+                      代码组   GRUPPE1
+                      代码  CODE1
+                      检验单元编号的计数器   STUECKNR
+                      初始值   ORIGINAL_INPUT
+测试数据（QAS）：检验批编号10000000075
+
+    2、查询检验批接口。
+    URL：http://192.168.0.103:8000/sap/bc/srt/wsdl/srvc_005056973A401EE4B3900ACB82159F00/wsdl11/allinone/ws_policy/document?sap-client=600
+    函数名称：ZWS_GET_PRUEFLOS
+    传入参数：检验批编号  PRUEFLOS
+                      工厂  WERK
+                      物料号  MATNR
+                      检验开始日期  PASTRTERM
+                      客户的帐户号  NAME
+                      销售订单编号  KDAUF
+                      订单号  Z_AUFNR
+                      库存  LGORTVORG
+    返回信息：状态标识G_FLAG（S：成功，E：失败）
+                     信息G_MESSAGE
+    列表信息：GT_TABLE
+                      检验批编号  PRUEFLOS
+                      工厂  WERK
+                      物料号  MATNR
+                      库存  LGORTVORG
+                      物料描述   KTEXTMAT
+                      实际批次数量  LMENGEIST
+                      采样大小  GESSTICHPR
+                      订单号  Z_AUFNR
+                      销售订单编号  KDAUF
+                      生产订单  Z_AUFNR
+                      生产线别  ZZSCXB
+                      生产课别  ZZSCKB
+                      生产部门  ZZSCBM
+                      检验开始日期  PASTRTERM
+                      客户的帐户号  KUNNR
+                      客户简称  NAME1
+                      判断结果  VCODE
+                      判定日期  VDATUM
+                      供应商   LIFNR
+                      供应商简称   ZNAME
+测试数据（QAS）：检验批编号10000000075
+
+3检验批结果录入接口。
+    URL：http://192.168.0.103:8000/sap/bc/srt/wsdl/srvc_005056973A401EE4B390148662E15F00/wsdl11/allinone/ws_policy/document?sap-client=600
+    函数名称：ZWS_INSPOPER_RECORDRESULTS
+    传入参数：检验批编号  PRUEFLOS
+                     检验批工序号  INSPOPER
+                     检验批特性编号  INSPCHAR
+                     已检验数量   VALID_VALS
+                     代码组   GRUPPE1
+                     代码  CODE1
+                     检验单元编号  RES_NO
+                     计量值  RES_VALUE
+    返回信息：状态标识G_FLAG（S：成功，E：失败）
+                     信息G_MESSAGE
+
+    定性传：检验批编号，检验批工序号，检验批特性编号，已检验数量，代码组，代码
+    定量传：检验批编号，检验批工序号，检验批特性编号，检验单元编号，计量值

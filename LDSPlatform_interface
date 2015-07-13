@@ -1,0 +1,577 @@
+将工程部署到服务器：
+1、拷贝ojdbc.jar到glassfish
+2、./asadmin add-resources xml_path/glassfish-resources.xml
+3、./asadmin restart-domain domain1
+4、deploy
+
+0、拉取表单类型列表：（后续加上权限控制可以更改此接口）
+GET：
+url：http://localhost:8081/LDSPlatform-war/rest/tablelist
+输出：
+	[
+	    {
+		"questionType": "S_A",
+		"tableName": "首件工序确认单_LED总装"
+	    },
+	    {
+		"questionType": "S_B",
+		"tableName": "首件工序确认单_LED包装"
+	    },
+	    {
+		"questionType": "X_E",
+		"tableName": "制程巡检表_CFL总装"
+	    },
+	    {
+		"questionType": "X_F",
+		"tableName": "制程巡检表_印刷"
+	    }
+	]
+
+1、根据表单类型查找第一个问题：
+GET：
+url：http://localhost:8081/LDSPlatform-war/rest/questionbank/firstQuestion?questionType=A
+输入：questionType=A
+输出：	[
+	    {
+		"questionId": 1,
+		"level1": 1,
+		"level2": 0,
+		"level3": 0,
+		"questionText": "是否有挂SOP",
+		"operationSeq": "装入驱动板",
+		"isKey": "Y"
+	    }
+	]
+2、根据表单类型返回问题题号列表：
+GET：
+url：http://localhost:8081/LDSPlatform-war/rest/questionbank/questionContents?questionType=A
+输入：表单类型
+输出：	[
+	    {
+		"questionId": 1,
+		"level1": 1,
+		"level2": 0,
+		"level3": 0
+	    },
+	    {
+		"questionId": 2,
+		"level1": 2,
+		"level2": 0,
+		"level3": 0
+	    },
+	    {
+		"questionId": 3,
+		"level1": 3,
+		"level2": 0,
+		"level3": 0
+	    }
+	]
+
+3、根据QuestionID查找问题选项：
+GET：
+url：http://localhost:8081/LDSPlatform-war/rest/questionbank/questionOptions?questionId=19
+输入：QuestionID（题库表的主键）
+输出：	[
+	    {
+		"optionId": 18,
+		"optionText": "导热硅脂"
+	    },
+	    {
+		"optionId": 19,
+		"optionText": "导热硅胶"
+	    },
+	    {
+		"optionId": 20,
+		"optionText": "其他"
+	    }
+	]
+
+4、根据题号查找下一题：
+GET：
+url：http://localhost:8081/LDSPlatform-war/rest/questionbank/nextQuestion?questionType=A&level_1=1&level_2=0&level_3=0
+输入：表单类型、题号（level1，level2，level3）
+输出：	[
+	    {
+		"questionId": 1,
+		"level1": 1,
+		"level2": 0,
+		"level3": 0,
+		"questionText": "是否有挂SOP",
+		"operationSeq": "装入驱动板",
+		"isKey": "Y"
+	    }
+	]
+
+4.1、根据题号查找题目信息：
+GET：http://localhost:8081/LDSPlatform-war/rest/questionbank/getQuestion?questionId=19
+输入：questionId
+输出：	[
+	    {
+		"questionId": 1,
+		"level1": 1,
+		"level2": 0,
+		"level3": 0,
+		"questionText": "是否有挂SOP",
+		"operationSeq": "装入驱动板",
+		"isKey": "Y"
+	    }
+	]
+
+5、根据工单号查询头信息：
+GET：
+url：http://localhost:8081/LDSPlatform-war/rest/recorder/headerInfo?workOrderNum=100014741103
+输入：工单号
+输出：
+[
+    {
+        "makeOrderNum": "001000147411",
+        "poNumber": "20001354",
+        "soNumber": "50",
+        "poQty": "100000",
+        "itemCode": "000000001320100011",
+        "descriptions": "LED_A400S-A6-25_220-240V_827_R_首尔_保税",
+        "customer": "test",
+        "prodLineGroupCode": "PLG01",
+        "prodLineCode": "X-LED-04",
+        "plantCode": "1400"
+    }
+]
+
+6、插入抬头表数据：
+POST：
+url：http://localhost:8081/LDSPlatform-war/rest/recorder/create/header
+create时输入：	
+{
+  	"documentType": "X_A",
+        "documentStatus": "Z",
+        "workOrderId": 3,
+        "createdBy": 0,
+        "lastUpdatedBy": 0,
+        "lastUpdateLogin": 0,
+        "shiftCode": "3"
+	"prodLineGroupId":11,
+	"prodLineId":111
+}
+edit时输入：
+{
+	"documentNumber": "20140923001",
+        "documentType": "X_A",
+        "documentStatus": "Z",
+        "workOrderId": 333333,
+        "createdBy": 0,
+        "lastUpdatedBy": 0,
+        "lastUpdateLogin": 0,
+        "shiftCode": "3",
+	"prodLineGroupId":11,
+	"prodLineId":111
+}
+输出："true" or "false" or "20140921001"(检验批号)
+
+
+8.插入行表数据（数据录入）
+POST：
+url：http://localhost:8081/LDSPlatform-war/rest/recorder/create/line
+输入：
+{"documentNumber":"20140921011",
+ "level1": "1",
+ "level2": "0",
+ "level3": "0",
+ "optionId": "1",
+ "resultCode": "1",
+ "resultText": "test4",
+ "createdBy": "-1",
+ "creationDate": "2014-09-21 16:19:07 +0800",
+ "lastUpdatedBy": "-1",
+ "lastUpdateDate": "2014-09-21 16:19:07 +0800",
+ "lastUpdateLogin": "-1"
+}
+输出："true" or "false"
+
+9.查询生产课别列表
+GET:
+url：http://localhost:8081/LDSPlatform-war/rest/linegroup
+输出：
+[
+    {
+        "createdBy": 20000241,
+        "creationDate": "2014-09-18 18:32:20 +0800",
+        "lastUpdatedBy": 20000241,
+        "lastUpdateDate": "2014-09-18 18:32:20 +0800",
+        "scheduleRegionId": 443,
+        "prodLineGroupId": 1926,
+        "prodLineGroupCode": "PLG01",
+        "descriptions": "生产一课",
+        "enableFlag": "Y",
+        "autoDeriveMo": "N",
+        "basicAlgorithm": "B+",
+        "extendedAlgorithm": "D"
+    }
+]
+
+10.根据prodLineGroupId查询生产线别
+GET：
+url：http://localhost:8081/LDSPlatform-war/rest/prodline/prodLineGroupId?prodLineGroupId=1926
+输入：prodLineGroupId=1926
+输出：
+[
+    {
+        "createdBy": 20000441,
+        "creationDate": "2014-09-18 19:38:20 +0800",
+        "lastUpdatedBy": 20000441,
+        "lastUpdateDate": "2014-09-18 19:39:23 +0800",
+        "scheduleRegionId": 443,
+        "plantId": 101,
+        "prodLineGroupId": 1926,
+        "prodLineId": 10942,
+        "prodLineCode": "MR",
+        "prodLineType": "P",
+        "descriptions": "自动MR线",
+        "rateType": 1,
+        "rate": 1000,
+        "activity": 100,
+        "planner": "M",
+        "bottleneckFlag": "N",
+        "enableFlag": "Y",
+        "productionLineAlt": "自动MR线"
+    }
+]
+
+
+11.根据表单类型获取题目列表
+GET:
+URL:http://localhost:8081/LDSPlatform-war/rest/questionbank/questionlist?questionType=S_A
+输入：questionType=S_A
+输出：
+[
+    {
+        "questionId": 81,
+        "level1": 1,
+        "level2": 0,
+        "level3": 0,
+        "questionText": "是否有挂SOP"
+    },
+    {
+        "questionId": 82,
+        "level1": 2,
+        "level2": 0,
+        "level3": 0,
+        "questionText": "作业员是否做好防静电措施"
+    }
+]
+
+12.获取题目列表及答案
+GET:
+URL:http://localhost:8081/LDSPlatform-war/rest/result/questionandresult?documentNumber=20140930020
+输入：documentNumber=20140930020
+输出：
+[
+      {
+        "documentHeaderId": 242,
+        "documentNumber": "20140930020",
+        "documentType": "S_B",
+        "workOrderId": "100015110802",
+        "documentLineId": 2037,
+        "level1": 19,
+        "level2": 0,
+        "level3": 0,
+        "questionText": "首件确认结果",
+        "optionId": 194,
+        "optionText": "合格",
+        "resultText": "OK"
+    }
+]
+
+13.获取主页的列表数据
+GET:
+URL:http://localhost:8081/LDSPlatform-war/rest/header/homelist?documentStatus=COMPLETE&fromDate=2014-09-09 00:00&toDate=2014-10-10 10:10&plantId=102
+输出：
+[
+   {
+        "documentHeaderId": "231",
+        "documentNum": "20140930009",
+        "typeCode": "S_A",
+        "docType": "首件工序确认单_LED总装",
+        "workOrderNum": "100015110802",
+        "poNumber": "0010016379",
+        "soNumber": "000020",
+        "customer": "C045",
+        "prodLineCode": "LED自包A21",
+        "creationDate": "2014-09-30 11:10:42.0",
+        "prodLineId": "10962",
+        "prodLineGroupId": "1945",
+        "shiftCode": "1"
+    },
+	.
+	.
+	.
+]
+
+
+查询首页列表信息ＳＱＬ：
+
+SELECT ddh.document_header_id,
+       ddh.document_number,
+       v.meaning doc_type,
+       hwo.work_order_num,
+       lmo.so_number,
+       lmo.customer,
+       hpl.production_line_alt,
+       '' iqc,
+       ddh.creation_date
+  FROM droid_document_header ddh,
+       hfwk_lookup_types_v   v,
+       hme_work_order_b      hwo,
+       ldx_mo_wo_ref         lmr,
+       ldx_make_order        lmo,
+       hcm_production_line   hpl
+WHERE 1 = 1
+   AND v.lookup_type_code = 'DROID_DOCUMENT_TYPE'
+   AND v.lookup_code = ddh.document_type
+   AND ddh.work_order_id = hwo.work_order_num
+   AND hwo.work_order_id = lmr.work_order_id
+   AND lmr.make_order_id = lmo.make_order_id
+   AND nvl(ddh.prod_line_id, hwo.prod_line_id) = hpl.prod_line_id
+      --AND ddh.document_status = ''
+   AND lmo.so_number LIKE '%%'
+   AND (hpl.production_line_alt LIKE '%%' OR hpl.descriptions LIKE '%%')
+   AND lmo.customer LIKE '%%'
+  /* AND ddh.creation_date BETWEEN to_date('2014-10-14 8:00', 'yyyy-mm-dd hh24:mi:ss') AND
+       to_date('2014-10-13 8:00', 'yyyy-mm-dd hh24:mi:ss');*/
+
+
+
+--查询题目及答案
+
+SELECT ddh.document_header_id,
+       ddh.document_number,
+       ddh.document_type,
+       ddh.work_order_id,
+       dhl.document_line_id,
+       dqb.level_1,
+       dqb.level_2,
+       dqb.level_3,
+       dqb.question_text,
+       dqb.operation_seq,
+       dqb.is_key,
+       dqo.OPTION_ID,
+       dqo.option_text,
+       dhl.RESULT_TEXT,
+       dhl.RESULT_CODE
+  FROM droid_document_header  ddh,
+       droid_document_line    dhl,
+       droid_question_bank    dqb,
+       droid_question_options dqo
+WHERE ddh.document_header_id = dhl.document_header_id
+   AND ddh.document_type = dqb.question_type
+   AND dhl.level_1 = dqb.level_1
+   AND dhl.level_2 = dqb.level_2
+   AND dhl.level_3 = dqb.level_3
+   AND dhl.option_id = dqo.option_id(+)
+   AND ddh.document_number = '20141007006'
+ORDER BY dqb.level_1, dqb.level_2, dqb.level_3
+
+
+
+
+SELECT ddh.document_header_id,
+       ddh.document_number,
+       ddh.document_type,
+       ddh.work_order_id,
+       dhl.document_line_id,
+       dqb.level_1,
+       dqb.level_2,
+       dqb.level_3,
+       dqb.question_text,
+       dqb.operation_seq,
+       dqb.is_key,
+       dqo.OPTION_ID,
+       dqo.option_text,
+       dhl.RESULT_TEXT,
+       dhl.RESULT_CODE
+  FROM droid_document_header  ddh,
+       droid_document_line    dhl,
+       droid_question_bank    dqb,
+       droid_question_options dqo
+WHERE ddh.document_header_id = dhl.document_header_id(+)
+   AND ddh.document_type = dqb.question_type
+   AND dhl.option_id = dqo.option_id(+)
+   AND ddh.document_number = '20141006002'
+ORDER BY dqb.level_1, dqb.level_2, dqb.level_3
+
+########################OQC监装#############################
+
+0.获取版本号：
+[GET]http://localhost:8081/LDSPlatform-war/rest/softwareinfo/oqcversion
+输出：
+{
+    "version": "1.01"
+}
+
+1.根据外向交货单号获得销售订单号和客户简称
+[GET]http://localhost:8081/LDSPlatform-war/rest/oqc/sonumber?innerPoNumber=0080004788
+输入：innerPoNumber=0080004788
+输出：
+[
+    {
+        "soNumber": "0010003933",
+        "customerNameAlt": "YE"
+    },
+    {
+        "soNumber": "0010003934",
+        "customerNameAlt": "YE"
+    },
+    {
+        "soNumber": "0010003933",
+        "customerNameAlt": "YE"
+    },
+    {
+        "soNumber": "0010003934",
+        "customerNameAlt": "YE"
+    }
+]
+
+2.插入头表数据
+[POST]http://localhost:8081/LDSPlatform-war/rest/oqc/create/header
+输入：
+{
+        "documentHeaderId": "550E8400-E29B-11D4-A716-446655440001",
+  	"documentNumber": "20141216000003",
+        "documentType": "OQC_J",
+        "documentStatus": "COMPLETE",
+        "inspectionDate": "2014-12-16 10:54:35 +0800",
+        "outboundDeliveryNumber": "123",
+        "cabinetNumber": "12",
+        "lockNumber": "34",
+        "actualShipment": 56,
+        "resultCode": "NG",
+        "inspectionException": "everything is not good",
+        "inspector": "5772",
+        "createdBy": 0,
+        "creationDate": "2014-12-16 10:54:35 +0800",
+        "lastUpdatedBy": 0,
+        "lastUpdateDate": "2014-12-16 10:54:35 +0800",
+        "lastUpdateLogin": 0
+}
+输出：
+{
+    "documentNumber": "20141216000003"
+}
+
+3.插入行表数据（录入数据）
+[POST]http://localhost:8081/LDSPlatform-war/rest/oqc/create/line
+输入：
+{
+        "documentLineId": "CDFG8400-E29B-11D4-A716-446655440000",
+        "documentHeaderId": "550E8400-E29B-11D4-A716-446655440000",
+        "level1": 1,
+        "level2": 0,
+        "level3": 0,
+        "resultCode": "OK",
+        "resultText": "92 34 57 88 90",
+        "createdBy": 0,
+        "creationDate": "2014-12-16 14:55:21 +0800",
+        "lastUpdatedBy": 0,
+        "lastUpdateDate": "2014-12-16 14:55:21 +0800",
+        "lastUpdateLogin": 0
+}
+输出：
+{
+    "documentLineId": "CDFG8400-E29B-11D4-A716-446655440000"
+}
+
+4.获取题目和答案列表
+[GET]http://localhost:8081/LDSPlatform-war/rest/oqc/questionandresult?documentNumber=20141216000003
+输入：documentNumber=20141216000003
+输出：
+[
+    {
+        "documentOqcHeaderId": "550E8400-E29B-11D4-A716-446655440000",
+        "documentNumber": "20141216000002",
+        "documentType": "OQC_J",
+        "outboundDeliveryNumber": "123",
+        "documentOqcLineId": "FFFF8400-E29B-11D4-A716-446655440000",
+        "questionId": 2779,
+        "level1": 1,
+        "level2": 0,
+        "level3": 0,
+        "questionText": "出货产品是否经过OQC检验合格、客人是否验货合格",
+        "resultText": "92 34 57 88 90",
+        "resultCode": "NG"
+    },
+    {
+        "documentOqcHeaderId": "550E8400-E29B-11D4-A716-446655440000",
+        "documentNumber": "20141216000002",
+        "documentType": "OQC_J",
+        "outboundDeliveryNumber": "123",
+        "documentOqcLineId": "CDFG8400-E29B-11D4-A716-446655440000",
+        "questionId": 2780,
+        "level1": 2,
+        "level2": 0,
+        "level3": 0,
+        "questionText": "栈板打包方式的核对确认：依出货明细对应的销售订单号，对出货产品进行100%栈板包装方式确认",
+        "resultText": "92 34 57 88 90",
+        "resultCode": "OK"
+    },
+    {
+        "documentOqcHeaderId": "550E8400-E29B-11D4-A716-446655440000",
+        "documentNumber": "20141216000002",
+        "documentType": "OQC_J",
+        "outboundDeliveryNumber": "123",
+        "questionId": 2781,
+        "level1": 3,
+        "level2": 0,
+        "level3": 0,
+        "questionText": "实际出货品包装栈板边上是否有按要求加上护脚"
+    }
+]
+
+5.获取刷选条目列表
+[GET]http://localhost:8081/LDSPlatform-war/rest/oqc/homelist?resultCode=NG&fromDate=2014-12-16 00:00:00&toDate=2014-12-17 00:00:00
+输出：
+[
+    {
+        "documentHeaderId": "550E8400-E29B-11D4-A716-446655440000",
+        "documentNumber": "20141216000002",
+        "documentType": "OQC_J",
+        "documentStatus": "NEW",
+        "inspectionDate": "2014-12-16 10:54:35 +0800",
+        "outboundDeliveryNumber": "0080004788",
+        "cabinetNumber": "12",
+        "lockNumber": "34",
+        "actualShipment": 56,
+        "resultCode": "OK",
+        "inspectionException": "everything is ok",
+        "inspector": "5772",
+        "attr1": "YE",
+        "attr2": "0010003933,00010003934",
+        "createdBy": 0,
+        "creationDate": "2014-12-16 11:11:43 +0800",
+        "lastUpdatedBy": 0,
+        "lastUpdateDate": "2014-12-16 11:11:43 +0800",
+        "lastUpdateLogin": 0
+    }
+]
+
+6.查看图片连接:
+URL:http://172.16.13.149:8081/LDSPlatform-war/oqc/loadpicture.jsp?id=f9dd1789-73a0-4b79-9296-4c797f28d65d
+
+7.获取监装题库类型列表
+[GET]http://localhost:8081/LDSPlatform-war/rest/tablelist/oqcj
+输出：
+[
+    {
+        "questionType": "OQC_J",
+        "tableName": "监装检验报表"
+    }
+]
+
+apk下载地址：
+http://192.168.0.88:8081/LDSPlatform-war/apkresource/pqc/LDSPlatform_pqc.apk
+http://192.168.0.88:8081/LDSPlatform-war/apkresource/oqcj/LDSPlatform_oqcj.apk
+
+########################FQC#############################
+
+
+
+
+

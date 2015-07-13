@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+    <!--    <session-config>
+        <session-timeout>
+            3000
+        </session-timeout>
+    </session-config>-->
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+    <security-constraint>
+        <!-- web resources that are protected -->
+        <web-resource-collection>
+            <web-resource-name>login</web-resource-name>
+            <description/>
+            <!-- All methods but OPTIONS must be authenticated. OPTIONS must work without authentication for cross domain in Firefox to work -->
+            <url-pattern>/rest/login</url-pattern>
+            <http-method>GET</http-method>
+        </web-resource-collection>
+        <auth-constraint>
+            <!-- role-name indicates roles that are allowed to access the web resource specified above -->
+            <role-name>role1</role-name>
+        </auth-constraint>
+    </security-constraint>
+    <login-config>
+        <auth-method>BASIC</auth-method>
+        <realm-name>LDAP</realm-name>
+    </login-config>
+    <security-role>
+        <role-name>role1</role-name>
+    </security-role>
+</web-app>

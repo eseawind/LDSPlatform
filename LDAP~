@@ -1,0 +1,23 @@
+LDAP
+com.sun.enterprise.security.auth.realm.ldap.LDAPRealm
+
+ldapRealm
+ldap://192.168.0.36:389
+ou=ou,dc=leedarson,dc=local
+Authenticated
+
+search-bind-dn:leedarson\adminmesou
+search-bind-password:mesou3.1$
+group-search-filter:(&(objectClass=group)(member=%d))
+search-filter:(&(objectClass=user)(sAMAccountName=%s))
+
+
+配置参考资料
+http://www.webdavsystem.com/javaserver/doc/authentication/ldap_glassfish?nsukey=hdEPtnnclkcKZJ4HVDb1uWTdLT%2F9PW0yxA8NxL1Ab9Nd%2FG5uE0Y9qjnMCh4cM4DpVlbO2Z8iuDHLD9XFDvguYA%3D%3D
+
+测试用户名密码：tscyx/tscyx
+
+group-search-filter (&(objectCategory=person)(member=%d))
+search-filter (&(objectCategory=person)(sAMAccountName=%s))
+
+

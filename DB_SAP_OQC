@@ -1,0 +1,90 @@
+
+select * from LDX_MAKE_ORDER lmo;
+select * from HME_WORK_ORDER_B hwo where hwo.WORK_ORDER_NUM = '100019258405' and hwo.PLANT_ID = 101;
+select * from LDX_MO_WO_REF lmr;
+select * from HCM_ITEM_V hiv;
+
+select
+	dfdh.DOCUMENT_HEADER_ID,
+	dfdh.DOCUMENT_NUMBER,
+	dfdh.CATEGORY,
+	dfdh.DOCUMENT_TYPE,
+	dfdh.DOCUMENT_STATUS,
+	dfdh.WORK_ORDER_NUMBER,
+	dfdh.PROD_LINE_GROUP_DES,
+	dfdh.PROD_LINE_ID_DES,
+	dfdh.INSPECTION_AMOUNT,
+	dfdh.SAMPLING_AMOUNT,
+	dfdh.INSPECTOR,
+	dfdh.RESULT_CODE,
+	dfdh.CREATION_DATE,
+	hiv.ITEM_CODE,
+	--hiv.ITEM_GROUP,
+	lmo.PLANT_CODE,
+	lmo.CUSTOMER ,
+	lmo.PO_NUMBER ,
+	lmo.SO_NUMBER ,
+	hiv.DESCRIPTIONS,
+	hiv.LONG_DESCRIPTIONS
+from 
+	DROID_FQC_DOCUMENT_HEADER	dfdh,
+	LDX_MAKE_ORDER        		lmo,
+	HME_WORK_ORDER_B      		hwo,
+	LDX_MO_WO_REF 				lmr,
+	HCM_ITEM_V					hiv
+where 1=1
+	and dfdh.WORK_ORDER_NUMBER = hwo.WORK_ORDER_NUM
+	and lmo.MAKE_ORDER_ID = lmr.MAKE_ORDER_ID
+	and lmr.WORK_ORDER_ID = hwo.WORK_ORDER_ID
+	and hiv.ITEM_ID = lmo.ITEM_ID
+	and hiv.PLANT_CODE = lmo.PLANT_CODE
+	and dfdh.DOCUMENT_STATUS = 'NEW' --status
+	--and dfdh.RESULT_CODE = 'OK'
+	--and dfdh.WORK_ORDER_NUMBER = '100019258405' --work order number
+	--and lmo.CUSTOMER like '%%'  --customer
+	--and hiv.ITEM_CODE = '2060911902'
+	and dfdh.WORK_ORDER_NUMBER in (select hwo.WORK_ORDER_NUM from hme_work_order_b hwo where hwo.PLANT_ID = 101) --factory
+	and dfdh.CREATION_DATE between to_date('2015-01-19 09:54:11','yyyy-mm-dd hh24:mi:ss') and to_date('2015-01-19 10:54:11','yyyy-mm-dd hh24:mi:ss')  --time
+	
+select
+	hiv.ITEM_CODE,
+	lmo.PLANT_CODE,
+	lmo.CUSTOMER ,
+	lmo.PO_NUMBER ,
+	lmo.SO_NUMBER ,
+	hiv.DESCRIPTIONS,
+	hiv.LONG_DESCRIPTIONS,
+	dfdh.* 
+from 
+	DROID_FQC_DOCUMENT_HEADER	dfdh,
+	LDX_MAKE_ORDER        		lmo,
+	HME_WORK_ORDER_B      		hwo,
+	LDX_MO_WO_REF 			lmr,
+	HCM_ITEM_V			hiv
+where 1=1
+	and dfdh.WORK_ORDER_NUMBER = hwo.WORK_ORDER_NUM
+	and lmo.MAKE_ORDER_ID = lmr.MAKE_ORDER_ID
+	and lmr.WORK_ORDER_ID = hwo.WORK_ORDER_ID
+	and hiv.ITEM_ID = lmo.ITEM_ID
+	and hiv.PLANT_CODE = lmo.PLANT_CODE
+	and dfdh.DOCUMENT_STATUS = 'NEW' --status
+	and dfdh.WORK_ORDER_NUMBER in (select hwo.WORK_ORDER_NUM from hme_work_order_b hwo where hwo.PLANT_ID = 101) --factory
+	and dfdh.CREATION_DATE between to_date('2015-01-19 09:54:11','yyyy-mm-dd hh24:mi:ss') and to_date('2015-01-19 10:54:11','yyyy-mm-dd hh24:mi:ss')  --time
+	
+select * from QPMK;
+select * from QPMT where MKMNR;
+select * from QAMR where PRUEFLOS = '100000019610';
+
+select * from QAMV;
+select * from QDSV;
+
+select
+from 
+	QAMR qamr,
+	QPMK qpmk,
+	QPMT qpmt
+where 1 = 1
+and qamr.PRUEFLOS = '100000019610';
+and qpmt.MANDT = qpmk.MANDT
+
+select * from DROID_DOCUMENT_HEADER order by CREATION_DATE desc;

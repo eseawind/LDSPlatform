@@ -1,0 +1,352 @@
+select distinct lpv.CUSTOMER_NAME_ALT,
+		lpv.SO_NUMBER 
+from ldx_sap_inner_po_v lpv
+where 1 = 1
+	and lpv.INNER_PO_NUMBER = 0080004788;
+	
+select * from DROID_OQC_DOCUMENT_HEADER; 
+
+select * from DROID_DOCUMENT_HEADER;
+
+select * from hme_work_order_b hwo where hwo.WORK_ORDER_NUM = '100015110802';
+
+select * from DROID_OQC_RESOURCE where DOCUMENT_HEADER_ID = 'b025d6a8-096d-4382-936d-b07e5344645a'
+delete from DROID_OQC_RESOURCE where RESOURCE_ID = '-2';
+
+UPDATE DROID_OQC_RESOURCE SET DOCUMENT_HEADER_ID = 'f9dd1789-73a0-4b79-9296-4c797f28d65d' WHERE RESOURCE_ID = 'c85f612c-23a2-4ec1-a92e-4fa0db5556df';
+
+INSERT INTO DROID_OQC_RESOURCE 
+(RESOURCE_ID, DOCUMENT_HEADER_ID, FILE_NAME, CONTENT_TYPE, FILE_PATH, ATTR1, ATTR2, ATTR3, ATTR4, ATTR5, CREATED_BY, CREATION_DATE, LAST_UPDATED_BY, LAST_UPDATED_DATE) 
+VALUES 
+('11831184-5c47-4db4-8a81-ba6703cb8768', 'f9dd1789-73a0-4b79-9296-4c797f28d65d', '11831184-5c47-4db4-8a81-ba6703cb8768', 'image/jpeg', '/home/chenfeng/Desktop/picupload/', '', '', '', '', '', '0', '2014-12-18 21:12:00 +0800', '0', '2014-12-18 21:12:00 +0800');
+
+select max(t.DOCUMENT_NUMBER) from DROID_OQC_DOCUMENT_HEADER t
+
+delete from DROID_OQC_DOCUMENT_HEADER t where t.DOCUMENT_HEADER_ID > '1';
+
+select * from DROID_OQC_DOCUMENT_HEADER;
+
+delete from DROID_OQC_DOCUMENT_LINE t where t.DOCUMENT_LINE_ID > '1';
+
+select * from DROID_QUESTION_BANK order by QUESTION_ID desc;
+
+select * from DROID_QUESTION_BANK t where t.QUESTION_TYPE= 'OQC_J' ORDER BY t.level_1, t.level_2, t.level_3;
+
+INSERT INTO DROID_OQC_DOCUMENT_HEADER 
+	(DOCUMENT_HEADER_ID, DOCUMENT_NUMBER, DOCUMENT_TYPE, DOCUMENT_STATUS, INSPECTION_DATE, OUTBOUND_DELIVERY_NUMBER, CABINET_NUMBER, LOCK_NUMBER, ACTUAL_SHIPMENT, RESULT_CODE, INSPECTION_EXCEPTION, INSPECTOR, ATTR1, ATTR2, ATTR3, ATTR4, ATTR5, CREATED_BY, CREATION_DATE, LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN)
+VALUES 
+ 	('550E8400-E29B-11D4-A716-446655440000', '20141216000001', 'OQC_J', 'NEW', sysdate, '123', '12', '34', 56, 'OK', 'everything is ok', '5772', '', '', '', '', '', 0, sysdate, 0, sysdate, 0);
+
+INSERT INTO DROID_OQC_DOCUMENT_LINE 
+	(DOCUMENT_LINE_ID, DOCUMENT_HEADER_ID, LEVEL_1, LEVEL_2, LEVEL_3, RESULT_CODE, RESULT_TEXT, ATTR1, ATTR2, ATTR3, ATTR4, ATTR5, CREATED_BY, CREATION_DATE, LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN) 
+VALUES 
+	('FFFF8400-E29B-11D4-A716-446655440000', '550E8400-E29B-11D4-A716-446655440000', 1, 0, 0, 'OK', '92 34 57 88 90', '', '', '', '', '', 0, sysdate, 0, sysdate, 0);
+
+
+select t.DOCUMENT_HEADER_ID from droid_oqc_document_header t where t.DOCUMENT_NUMBER = '20141216000003';
+
+SELECT ddh.document_header_id, 
+       ddh.document_number, 
+       ddh.document_type, 
+       ddh.OUTBOUND_DELIVERY_NUMBER, 
+       dhl.document_line_id, 
+       dqb.QUESTION_ID, 
+       dqb.level_1, 
+       dqb.level_2, 
+       dqb.level_3, 
+       dqb.question_text, 
+       dqb.operation_seq, 
+       dqb.is_key, 
+       dhl.RESULT_TEXT, 
+       dhl.RESULT_CODE 
+FROM droid_oqc_document_header  ddh, 
+       droid_oqc_document_line    dhl, 
+       droid_question_bank    dqb 
+WHERE ddh.document_number = '20141216000002'
+   AND dqb.question_type = ddh.document_type 
+   AND dhl.level_1(+) = dqb.level_1 
+   AND dhl.level_2(+) = dqb.level_2 
+   AND dhl.level_3(+) = dqb.level_3 
+   AND dhl.document_header_id(+) = '550E8400-E29B-11D4-A716-446655440000' 
+ORDER BY dqb.level_1, dqb.level_2, dqb.level_3;
+
+
+SELECT dodh.DOCUMENT_STATUS,
+	dodh.DOCUMENT_NUMBER,
+	dodh.INSPECTION_DATE,
+	dodh.OUTBOUND_DELIVERY_NUMBER,
+	lspv.SO_NUMBER,
+	lspv.CUSTOMER_NAME_ALT,
+	dodh.CABINET_NUMBER,
+	dodh.LOCK_NUMBER,
+	dodh.RESULT_CODE,
+	dodh.INSPECTOR
+FROM DROID_OQC_DOCUMENT_HEADER dodh, 
+	LDX_SAP_INNER_PO_V lspv
+WHERE 1=1
+	AND dodh.OUTBOUND_DELIVERY_NUMBER = lspv.INNER_PO_NUMBER
+	AND dodh.DOCUMENT_STATUS = 'NEW'
+	
+	
+SELECT * 
+FROM DROID_OQC_DOCUMENT_HEADER dodh
+WHERE dodh.RESULT_CODE = 'NG'
+	--AND dodh.DOCUMENT_NUMBER LIKE '%1216000002%'
+	AND dodh.OUTBOUND_DELIVERY_NUMBER LIKE '%%'
+	--AND dodh.ATTR2 LIKE '%%'	--销售订单号
+	--AND dodh.CABINET_NUMBER = '12'
+	--AND dodh.LOCK_NUMBER = '34'
+	--AND dodh.ATTR1 LIKE '%%'
+	AND dodh.INSPECTOR LIKE '%%'
+	AND dodh.CREATION_DATE BETWEEN to_date('2014-12-18 16:12:00', 'yyyy-mm-dd hh24:mi:ss') AND 
+		to_date('2014-12-18 18:12:00', 'yyyy-mm-dd hh24:mi:ss');
+		
+select v.LOOKUP_CODE, v.MEANING from hfwk_lookup_types_v v where v.lookup_type_code = 'DROID_DOCUMENT_TYPE' and (v.LOOKUP_CODE like '%S_%' or v.LOOKUP_CODE like '%X_%');
+
+
+SELECT lmo.make_order_num, --生产订单
+       lmo.po_number, --销售订单
+       lmo.so_number, --销售订单项目号
+       lsl.so_line_qty, --销售数量
+       lmo.customer, --客户简称
+       hiv.item_code, --ID,
+       hiv.descriptions, --短描述
+       hiv.long_descriptions, --长描述
+       hiv.one_item_group, --一阶物料组
+       hplg.descriptions, --生产课别
+       hpl.descriptions, --生产线别
+       hp.descriptions --生产工厂
+  FROM ldx_make_order            lmo,
+       ldx_mo_wo_ref             lmwr,
+       hcm_item_v                  hiv,
+       hcm_production_line       hpl,
+       hcm_production_line_group hplg,
+       hme_work_order            hwo,
+       hcm_plant                 hp,
+       ldx_so_line_mv lsl
+WHERE 1 = 1
+   AND lmo.plant_id = hiv.plant_id
+   AND hiv.item_id = lmo.item_id
+   AND hwo.prod_line_id = hpl.prod_line_id
+   AND lmwr.make_order_id = lmo.make_order_id
+   AND lmwr.work_order_id = hwo.work_order_id
+   AND hpl.prod_line_group_id = hplg.prod_line_group_id
+   AND lmo.plant_id = hp.plant_id
+   AND lmo.po_number = lsl.so_number(+)
+   and lmo.so_number = lsl.LINE_NUM(+)
+   AND hwo.work_order_num = 100014913407;
+   
+   
+SELECT DISTINCT ddh.document_header_id,
+                           ddh.document_number,
+                           v.lookup_code type_code,
+                           v.meaning doc_type,
+                           hwo.work_order_num,
+                           lmo.po_number,
+                           lmo.so_number,
+                           lmo.customer,
+                           hpl.production_line_alt,
+                           '' iqc,
+                           ddh.creation_date,
+                           hiv.LONG_DESCRIPTIONS,
+                           nvl(ddh.prod_line_id, hwo.prod_line_id) prod_line_id,
+                           nvl(ddh.PROD_LINE_GROUP_ID, hpl.PROD_LINE_GROUP_ID) PROD_LINE_GROUP_ID,
+                           ddh.SHIFT_CODE
+                      FROM droid_document_header ddh,
+                           hfwk_lookup_types_v   v,
+                           hme_work_order_b      hwo,
+                           ldx_mo_wo_ref         lmr,
+                           ldx_make_order        lmo,
+                           hcm_production_line   hpl,
+                           hcm_item_v            hiv
+                    WHERE 1 = 1
+                       AND v.lookup_type_code = 'DROID_DOCUMENT_TYPE'
+                       AND v.lookup_code = ddh.document_type
+                       AND ddh.work_order_id = hwo.work_order_num
+                       AND hwo.work_order_id = lmr.work_order_id
+                       AND lmr.make_order_id = lmo.make_order_id
+                       AND nvl(ddh.prod_line_id, hwo.prod_line_id) = hpl.prod_line_id
+                       AND hiv.item_id = lmo.item_id
+                       AND ddh.document_status = 'NEW'
+                       AND hwo.WORK_ORDER_NUM in (select hwo.WORK_ORDER_NUM from hme_work_order_b hwo where hwo.PLANT_ID = 102);
+
+
+
+
+--#######################################Create Tables for OQCJ###################################
+
+
+CREATE TABLE ADM_MES.DROID_OQC_DOCUMENT_HEADER (
+	DOCUMENT_HEADER_ID VARCHAR2(1000) NOT NULL,
+	DOCUMENT_NUMBER VARCHAR2(30) NOT NULL,
+	DOCUMENT_TYPE VARCHAR2(30) NOT NULL,
+	DOCUMENT_STATUS VARCHAR2(30) NOT NULL,
+	INSPECTION_DATE DATE NOT NULL,
+	OUTBOUND_DELIVERY_NUMBER VARCHAR2(1000),
+	CABINET_NUMBER VARCHAR2(250),
+	LOCK_NUMBER VARCHAR2(250),
+	ACTUAL_SHIPMENT NUMBER,
+	RESULT_CODE VARCHAR2(30) NOT NULL,
+	INSPECTION_EXCEPTION VARCHAR2(3000),
+	INSPECTOR VARCHAR2(1000),
+	ATTR1 VARCHAR2(1000),
+	ATTR2 VARCHAR2(1000),
+	ATTR3 VARCHAR2(1000),
+	ATTR4 VARCHAR2(1000),
+	ATTR5 VARCHAR2(1000),
+	CREATED_BY NUMBER NOT NULL,
+	CREATION_DATE DATE NOT NULL,
+	LAST_UPDATED_BY NUMBER NOT NULL,
+	LAST_UPDATE_DATE DATE NOT NULL,
+	LAST_UPDATE_LOGIN NUMBER,
+	PRIMARY KEY (DOCUMENT_HEADER_ID)
+);
+
+
+
+
+CREATE TABLE ADM_MES.DROID_OQC_DOCUMENT_LINE (
+	DOCUMENT_LINE_ID VARCHAR2(1000) NOT NULL,
+	DOCUMENT_HEADER_ID VARCHAR2(1000) NOT NULL,
+	LEVEL_1 NUMBER NOT NULL,
+	LEVEL_2 NUMBER,
+	LEVEL_3 NUMBER,
+	RESULT_CODE VARCHAR2(30) NOT NULL,
+	RESULT_TEXT VARCHAR2(3000),
+	ATTR1 VARCHAR2(1000),
+	ATTR2 VARCHAR2(1000),
+	ATTR3 VARCHAR2(1000),
+	ATTR4 VARCHAR2(1000),
+	ATTR5 VARCHAR2(1000),
+	CREATED_BY NUMBER NOT NULL,
+	CREATION_DATE DATE NOT NULL,
+	LAST_UPDATED_BY NUMBER NOT NULL,
+	LAST_UPDATE_DATE DATE NOT NULL,
+	LAST_UPDATE_LOGIN NUMBER,
+	PRIMARY KEY (DOCUMENT_LINE_ID)
+);
+
+
+
+CREATE TABLE ADM_MES.DROID_OQC_RESOURCE (
+	RESOURCE_ID VARCHAR2(1000) NOT NULL,
+	DOCUMENT_HEADER_ID VARCHAR2(1000) NOT NULL,
+	FILE_NAME VARCHAR2(1000),
+	CONTENT_TYPE VARCHAR2(1000),
+	FILE_PATH VARCHAR2(1000),
+	ATTR1 VARCHAR2(1000),
+	ATTR2 VARCHAR2(1000),
+	ATTR3 VARCHAR2(1000),
+	ATTR4 VARCHAR2(1000),
+	ATTR5 VARCHAR2(1000),
+	CREATED_BY VARCHAR2(1000) NOT NULL,
+	CREATION_DATE VARCHAR2(1000) NOT NULL,
+	LAST_UPDATED_BY VARCHAR2(1000),
+	LAST_UPDATED_DATE VARCHAR2(1000),
+	PRIMARY KEY (RESOURCE_ID)
+);
+
+
+
+select v.LOOKUP_CODE, v.MEANING from hfwk_lookup_types_v v where v.lookup_type_code = 'DROID_DOCUMENT_TYPE';
+
+
+/***************FQC***************/
+--FQC头表
+CREATE TABLE ADM_MES.DROID_FQC_DOCUMENT_HEADER (
+	DOCUMENT_HEADER_ID VARCHAR2(1000) NOT NULL,--主键ID
+	DOCUMENT_NUMBER VARCHAR2(30) NOT NULL,--检验批号
+	CATEGORY VARCHAR(30) NOT NULL,--类别（特殊检验/缺陷检验）
+	DOCUMENT_TYPE VARCHAR2(30) NOT NULL,--表单类型
+	DOCUMENT_STATUS VARCHAR2(30) NOT NULL,--待检/归档
+	--工厂
+	WORK_ORDER_NUMBER VARCHAR2(250),--生产工单号
+	--销售订单号
+	--销售订单行项目
+	--物料ID
+	--物料长描述
+	--生产部门
+	--客户简称
+	PROD_LINE_GROUP_DES VARCHAR2(250),--生产课别
+	PROD_LINE_ID_DES VARCHAR2(250),--生产线别
+	INSPECTION_AMOUNT VARCHAR2(250),--报检数量
+	SAMPLING_AMOUNT VARCHAR2(250),--抽样数量
+	SHIFT_CODE VARCHAR2(1),--班次
+	INSPECTOR VARCHAR2(250),--检验员
+	RESULT_CODE VARCHAR2(30),--判定结果
+	ATTR1 VARCHAR2(1000),--ATTR1
+	ATTR2 VARCHAR2(1000),--ATTR2
+	ATTR3 VARCHAR2(1000),--ATTR3
+	ATTR4 VARCHAR2(1000),--ATTR4
+	ATTR5 VARCHAR2(1000),--ATTR5
+	CREATED_BY NUMBER NOT NULL,
+	CREATION_DATE DATE NOT NULL,
+	LAST_UPDATED_BY NUMBER NOT NULL,
+	LAST_UPDATE_DATE DATE NOT NULL,
+	PRIMARY KEY (DOCUMENT_HEADER_ID)
+)
+
+--FQC项目检验行表
+CREATE TABLE ADM_MES.DROID_FQC_DOCUMENT_LINE(
+
+	DOCUMENT_LINE_ID VARCHAR2(1000) NOT NULL,--ID
+	DOCUMENT_HEADER_ID VARCHAR2(1000) NOT NULL,
+	LEVEL_1 NUMBER NOT NULL,
+	LEVEL_2 NUMBER,
+	LEVEL_3 NUMBER,
+	OPTION_ID NUMBER NOT NULL,
+	RESULT_CODE VARCHAR2(30) NOT NULL,
+	RESULT_TEXT VARCHAR2(3000),
+	ATTR1 VARCHAR2(1000),--ATTR1
+	ATTR2 VARCHAR2(1000),--ATTR2
+	ATTR3 VARCHAR2(1000),--ATTR3
+	ATTR4 VARCHAR2(1000),--ATTR4
+	ATTR5 VARCHAR2(1000),--ATTR5
+	CREATED_BY NUMBER NOT NULL,
+	CREATION_DATE DATE NOT NULL,
+	LAST_UPDATED_BY NUMBER NOT NULL,
+	LAST_UPDATE_DATE DATE NOT NULL,
+	PRIMARY KEY (DOCUMENT_LINE_ID)
+
+)
+
+--缺陷记录头表
+CREATE TABLE ADM_MES.DROID_FQC_BUG_HEADER (
+	DOCUMENT_BUG_HEADER_ID VARCHAR2(1000) NOT NULL,--主键ID
+	DOCUMENT_HEADER_ID VARCHAR2(1000) NOT NULL,--FQC头ID
+	BUG_LEVEL VARCHAR2(30),--缺陷级别（CR/MA/MB/MI)
+	SAMPLING_STANDARD VARCHAR2(100),--抽样标准(AQL)
+	ACCPECT_VALUE VARCHAR2(30),--接受数值(AC)
+	REJECT_VALUE VARCHAR2(30),--打回数值(RE)
+	BUGS_AMOUNT VARCHAR2(30),--不良数汇总(SUM)
+	RESULT_CODE VARCHAR2(30),--判定结果(默认OK)
+	ATTR1 VARCHAR2(1000),--ATTR1
+	ATTR2 VARCHAR2(1000),--ATTR2
+	ATTR3 VARCHAR2(1000),--ATTR3
+	ATTR4 VARCHAR2(1000),--ATTR4
+	ATTR5 VARCHAR2(1000),--ATTR5
+	CREATED_BY NUMBER NOT NULL,
+	CREATION_DATE DATE NOT NULL,
+	LAST_UPDATED_BY NUMBER NOT NULL,
+	LAST_UPDATE_DATE DATE NOT NULL,
+	PRIMARY KEY (DOCUMENT_BUG_HEADER_ID)
+)
+--缺陷检验行表
+CREATE TABLE ADM_MES.DROID_FQC_BUG_LINE (
+	DOCUMENT_BUG_LINE_ID VARCHAR2(1000) NOT NULL,--主键ID
+	DOCUMENT_BUG_HEADER_ID VARCHAR2(1000) NOT NULL,--缺陷记录头ID
+	BUG_CODE VARCHAR(250) NOT NULL,--缺陷代码
+	BUG_COUNT VARCHAR(250) NOT NULL,--缺陷数量
+	ATTR1 VARCHAR2(1000),--ATTR1
+	ATTR2 VARCHAR2(1000),--ATTR2
+	ATTR3 VARCHAR2(1000),--ATTR3
+	ATTR4 VARCHAR2(1000),--ATTR4
+	ATTR5 VARCHAR2(1000),--ATTR5
+	CREATED_BY NUMBER NOT NULL,
+	CREATION_DATE DATE NOT NULL,
+	LAST_UPDATED_BY NUMBER NOT NULL,
+	LAST_UPDATE_DATE DATE NOT NULL,
+	PRIMARY KEY (DOCUMENT_BUG_LINE_ID)
+)
+
+
